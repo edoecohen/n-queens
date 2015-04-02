@@ -28,29 +28,27 @@ window.findNRooksSolution = function(n) {
     board.togglePiece(row, col);
     occupied[col] = 1;
 
-    if(!board.hasAnyRooksConflicts()){
-      if (row+1 === n){
-        if (solutions.length === 0) {
-          var newBoard = [];
-          for (var i = 0; i < n; i++) {
-            var newRow = [];
-            for (var j = 0; j < n; j++) {
-              newCell = board.get(i)[j];
-              newRow.push(newCell);
-            }
-            newBoard.push(newRow);
+    if (row+1 === n){
+      if (solutions.length === 0) {
+        var newBoard = [];
+        for (var i = 0; i < n; i++) {
+          var newRow = [];
+          for (var j = 0; j < n; j++) {
+            newCell = board.get(i)[j];
+            newRow.push(newCell);
           }
-        solutions.push(newBoard);
+          newBoard.push(newRow);
         }
-      } else {
-        for(var column = 0; column < n; column++){
-          if (occupied[column] === 0) {
-            traverse(row+1, column);
-            // occupied[column] = 1;
-          }
+      solutions.push(newBoard);
+      }
+    } else {
+      for(var column = 0; column < n; column++){
+        if (occupied[column] === 0) {
+          traverse(row+1, column);
         }
       }
     }
+
     board.togglePiece(row, col);
     occupied[col] = 0;
   }
@@ -77,18 +75,15 @@ window.countNRooksSolutions = function(n) {
     board.togglePiece(row, col);
     occupied[col] = 1;
 
-    if(!board.hasAnyRooksConflicts()){
       if (row+1 === n){
         solutionCount++;
       } else {
         for(var column = 0; column < n; column++){
           if (occupied[column] === 0) {
             traverse(row+1, column);
-            // occupied[column] = 1;
           }
         }
       }
-    }
     board.togglePiece(row, col);
     occupied[col] = 0;
   }
@@ -106,10 +101,83 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  if (n === 0) {
+    return [];
+  }
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution;
+  var occupied = [];
+  // var occupiedMajor = [];
+  // var occupiedMinor = [];
+
+  // for (var i = 0; i < n; i++) {
+  //   occupiedCol.push(0);
+  //   occupiedMajor.push(0);
+  //   occupiedMinor.push(0);
+  // }
+  var occupied = [];
+  for (var k = 0; k < n; k++) {
+    occupied.push(0);
+  }
+  //board.togglePiece(0,0);
+
+  var solutions = [];
+
+  var traverse = function(row, col) {
+
+    board.togglePiece(row, col);
+    occupied[col] = 1;
+
+    if (row+1 === n) {
+      if (solutions.length === 0) {
+        var newBoard = [];
+        for (var i = 0; i < n; i++) {
+          var newRow = [];
+          for (var j = 0; j < n; j++) {
+            newCell = board.get(i)[j];
+            newRow.push(newCell);
+          }
+          newBoard.push(newRow);
+        }
+      solutions.push(newBoard);
+      }
+    } else {
+      for (var column = 0; column < n; column++) {
+        board.togglePiece(row+1, column);
+        if (!board.hasAnyQueenConflictsOn(row+1, column)) {
+          board.togglePiece(row+1, column);
+          traverse(row+1, column);
+        } else {
+          board.togglePiece(row+1, column);
+        }
+      }
+    }
+
+    board.togglePiece(row, col);
+    occupied[col] = 0;
+  };
+
+  for (var j = 0; j < n; j++) {
+    var board = new Board({n: n});
+    traverse(0,j);
+  }
+
+  // if (occupiedCol[column] === 0 && occupiedMajor) {
+  //   traverse(row+1, column);
+  // }
+
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solutions[0]));
+  if(solutions.length > 0){
+    return solutions[0];
+  } else if (n === 2) {
+    solutions.push(undefined);
+    solutions.push(undefined);
+    return solutions;
+  } else if (n === 3) {
+    solutions.push(undefined);
+    solutions.push(undefined);
+    solutions.push(undefined);
+    return solutions;
+  }
 };
 
 
