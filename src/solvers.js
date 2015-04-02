@@ -18,38 +18,43 @@ window.findNRooksSolution = function(n) {
   var board = new Board({n: n});
 
   var solutions = [];
+  var occupied = [];
+  for (var k = 0; k < n; k++) {
+    occupied.push(0);
+  }
+
   var traverse = function(row, col){
 
-    // var prevPiece = board.get(row).indexOf(1);
-    // if (prevPiece > -1) {
-    //   board.togglePiece(row, prevPiece);
-    // }
-
     board.togglePiece(row, col);
+    occupied[col] = 1;
 
     if(!board.hasAnyRooksConflicts()){
-      for(var i = 0; i < n; i++){
-
-        if (row+1 === n) {
-          if (solutions.length === 0) {
-            var newBoard = [];
-            for (var i = 0; i < n; i++) {
-              var newRow = [];
-              for (var j = 0; j < n; j++) {
-                newCell = board.get(i)[j];
-                newRow.push(newCell);
-              }
-              newBoard.push(newRow);
+      if (row+1 === n){
+        if (solutions.length === 0) {
+          var newBoard = [];
+          for (var i = 0; i < n; i++) {
+            var newRow = [];
+            for (var j = 0; j < n; j++) {
+              newCell = board.get(i)[j];
+              newRow.push(newCell);
             }
-            solutions.push(newBoard);
+            newBoard.push(newRow);
           }
-        } else {
-          traverse(row+1, i);
+        solutions.push(newBoard);
+        }
+      } else {
+        for(var column = 0; column < n; column++){
+          if (occupied[column] === 0) {
+            traverse(row+1, column);
+            // occupied[column] = 1;
+          }
         }
       }
     }
     board.togglePiece(row, col);
+    occupied[col] = 0;
   }
+
 
   traverse(0,0);
 
@@ -62,22 +67,30 @@ window.findNRooksSolution = function(n) {
 window.countNRooksSolutions = function(n) {
 
   var solutionCount = 0;
+  var occupied = [];
+  for (var k = 0; k < n; k++) {
+    occupied.push(0);
+  }
 
   var traverse = function(row, col){
 
     board.togglePiece(row, col);
+    occupied[col] = 1;
 
     if(!board.hasAnyRooksConflicts()){
       if (row+1 === n){
         solutionCount++;
       } else {
-        for(var i = 0; i < n; i++){
-          traverse(row+1, i);
+        for(var column = 0; column < n; column++){
+          if (occupied[column] === 0) {
+            traverse(row+1, column);
+            // occupied[column] = 1;
+          }
         }
       }
     }
-
     board.togglePiece(row, col);
+    occupied[col] = 0;
   }
 
   for (var j = 0; j < n; j++) {
