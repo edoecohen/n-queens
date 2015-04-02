@@ -21,41 +21,47 @@ window.findNRooksSolution = function(n) {
 
   // for each square in that first row --> kick off our decision tree
   // in the decision tree, recurse over each child
-  var solution;
+
+  var counter = 0;
+  var solutions = [];
   var traverse = function(row, col){
+
+    var prevPiece = board.get(row).indexOf(1);n
+    if (prevPiece > -1) {
+      board.togglePiece(row, prevPiece);
+    }
 
     board.togglePiece(row, col);
 
     // if no conflict, traverse children, unless we're in last row
     if(!board.hasAnyRooksConflicts()){
+
       for(var i = 0; i < n; i++){
 
         // no conflict & no more children --> we have our solution
         if (row+1 === n){
-          solution = board;
+          counter++;
+          solutions.push(board.rows());
+          board.togglePiece(row, col);
+        } else {
+          console.log('Table Size: ' + n + ' Lets traverse: ' + (row+1) + ', ' + i);
+          traverse(row+1, i);
         }
 
         // no conflict & yes children --> traverse all children
-        else {
-          traverse(row+1, i)
-        }
       }
-    }
-
-    // else, there is a conflict --> toggle back & skip that path
-    else {
-      board.togglePiece(row, col);
     }
 
   }
 
   traverse(0,0);
 
+  console.log('Table Size: ' + n + ' Counter: ' + counter);
+  // console.log(solutions);
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solution.rows();
+  return solutions[0].rows();
 };
 
-console.log(findNRooksSolution(12));
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
