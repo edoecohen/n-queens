@@ -17,55 +17,73 @@ window.findNRooksSolution = function(n) {
 
   var board = new Board({n: n});
 
-  // build a for loop that iterates over each colum
-
-  // for each square in that first row --> kick off our decision tree
-  // in the decision tree, recurse over each child
-
-  var counter = 0;
   var solutions = [];
   var traverse = function(row, col){
 
-    var prevPiece = board.get(row).indexOf(1);n
-    if (prevPiece > -1) {
-      board.togglePiece(row, prevPiece);
-    }
+    // var prevPiece = board.get(row).indexOf(1);
+    // if (prevPiece > -1) {
+    //   board.togglePiece(row, prevPiece);
+    // }
 
     board.togglePiece(row, col);
 
-    // if no conflict, traverse children, unless we're in last row
     if(!board.hasAnyRooksConflicts()){
-
       for(var i = 0; i < n; i++){
 
-        // no conflict & no more children --> we have our solution
-        if (row+1 === n){
-          counter++;
-          solutions.push(board.rows());
-          board.togglePiece(row, col);
+        if (row+1 === n) {
+          if (solutions.length === 0) {
+            var newBoard = [];
+            for (var i = 0; i < n; i++) {
+              var newRow = [];
+              for (var j = 0; j < n; j++) {
+                newCell = board.get(i)[j];
+                newRow.push(newCell);
+              }
+              newBoard.push(newRow);
+            }
+            solutions.push(newBoard);
+          }
         } else {
-          console.log('Table Size: ' + n + ' Lets traverse: ' + (row+1) + ', ' + i);
           traverse(row+1, i);
         }
-
-        // no conflict & yes children --> traverse all children
       }
     }
-
+    board.togglePiece(row, col);
   }
 
   traverse(0,0);
 
-  console.log('Table Size: ' + n + ' Counter: ' + counter);
-  // console.log(solutions);
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
-  return solutions[0].rows();
+  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solutions[0]));
+  return solutions[0];
 };
 
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+
+  var solutionCount = 0;
+
+  var traverse = function(row, col){
+
+    board.togglePiece(row, col);
+
+    if(!board.hasAnyRooksConflicts()){
+      if (row+1 === n){
+        solutionCount++;
+      } else {
+        for(var i = 0; i < n; i++){
+          traverse(row+1, i);
+        }
+      }
+    }
+
+    board.togglePiece(row, col);
+  }
+
+  for (var j = 0; j < n; j++) {
+    var board = new Board({n: n});
+    traverse(0,j);
+  }
 
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
